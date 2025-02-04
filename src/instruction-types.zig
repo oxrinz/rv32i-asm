@@ -9,6 +9,16 @@ pub const RTypeInstruction = enum {
     SRA,
     OR,
     AND,
+
+    // m extension
+    MUL,
+    MULH,
+    MULSU,
+    MULU,
+    DIV,
+    DIVU,
+    REM,
+    REMU,
 };
 
 pub const ITypeInstruction = enum {

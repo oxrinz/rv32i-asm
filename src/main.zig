@@ -47,20 +47,21 @@ const Instruction = union(enum) {
                 const rs2 = @as(u32, rtype.rs2);
 
                 const funct3: u32 = switch (rtype.instruction) {
-                    .ADD, .SUB => 0b000,
-                    .XOR => 0b100,
-                    .OR => 0b110,
-                    .AND => 0b111,
-                    .SLL => 0b001,
-                    .SRL, .SRA => 0b101,
-                    .SLT => 0b010,
-                    .SLTU => 0b011,
+                    .ADD, .SUB, .MUL => 0b000,
+                    .XOR, .DIV => 0b100,
+                    .OR, .REM => 0b110,
+                    .AND, .REMU => 0b111,
+                    .SLL, .MULH => 0b001,
+                    .SRL, .SRA, .DIVU => 0b101,
+                    .SLT, .MULSU => 0b010,
+                    .SLTU, .MULU => 0b011,
                 };
 
-                const funct7: u32 = if (rtype.instruction == .SUB or rtype.instruction == .SRA)
-                    0b0100000
-                else
-                    0b0000000;
+                const funct7: u32 = switch (rtype.instruction) {
+                    .SUB, .SRA => 0b0100000,
+                    .MUL, .MULH, .MULSU, .MULU, .DIV, .DIVU, .REM, .REMU => 0b0000001,
+                    else => 0b0000000,
+                };
 
                 return opcode |
                     (rd << 7) |

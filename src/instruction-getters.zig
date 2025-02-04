@@ -18,6 +18,16 @@ pub fn getRTypeInstruction(instruction: []const u8) !RTypeInstruction {
     if (std.mem.eql(u8, instruction, "sra")) return .SRA;
     if (std.mem.eql(u8, instruction, "or")) return .OR;
     if (std.mem.eql(u8, instruction, "and")) return .AND;
+
+    // m extension
+    if (std.mem.eql(u8, instruction, "mul")) return .MUL;
+    if (std.mem.eql(u8, instruction, "mulh")) return .MULH;
+    if (std.mem.eql(u8, instruction, "mulsu")) return .MULSU;
+    if (std.mem.eql(u8, instruction, "mulu")) return .MULU;
+    if (std.mem.eql(u8, instruction, "div")) return .DIV;
+    if (std.mem.eql(u8, instruction, "divu")) return .DIVU;
+    if (std.mem.eql(u8, instruction, "rem")) return .REM;
+    if (std.mem.eql(u8, instruction, "remu")) return .REMU;
     unreachable;
 }
 
