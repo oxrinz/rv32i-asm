@@ -63,6 +63,9 @@ const Instruction = union(enum) {
                     else => 0b0000000,
                 };
 
+                std.debug.print("rtype rs1: {b:0>5}\n", .{rs1});
+                std.debug.print("rtype rs2: {b:0>5}\n", .{rs2});
+
                 return opcode |
                     (rd << 7) |
                     (funct3 << 12) |
@@ -85,6 +88,8 @@ const Instruction = union(enum) {
                     .SRAI => @as(u32, (imm_bits & 0x1F) | 0x400),
                     else => @as(u32, imm_bits),
                 };
+
+                std.debug.print("itype rs1: {b:0>5}\n", .{rs1});
 
                 const funct3: u32 = switch (itype.instruction) {
                     .ADDI => 0b000,
@@ -306,6 +311,7 @@ fn parseRegister(reg: []const u8, reg_map: *const std.StringHashMap(u8)) !u8 {
     if (reg[0] == 'x') {
         return try std.fmt.parseInt(u8, reg[1..], 10);
     } else {
+        std.debug.print("parseregister: {b:0>5}\n", .{reg_map.get(reg).?});
         return reg_map.get(reg).?;
     }
 }
