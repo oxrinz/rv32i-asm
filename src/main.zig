@@ -317,7 +317,7 @@ fn parseInstruction(allocator: *const std.mem.Allocator, tokens: [][]const u8) !
     const instruction_token = tokens[0];
     const instruction_sets = .{
         .rtype = &[_][]const u8{ "add", "sub", "mul", "div", "sll", "slt", "sltu", "xor", "srl", "sra", "or", "and" },
-        .itype = &[_][]const u8{ "addi", "muli", "divi", "slti", "sltiu", "xori", "ori", "slli", "srli", "srai", "lb", "lh", "lw", "lbu", "lhu", "jalr" },
+        .itype = &[_][]const u8{ "addi", "muli", "divi", "slti", "sltiu", "xori", "andi", "ori", "slli", "srli", "srai", "lb", "lh", "lw", "lbu", "lhu", "jalr" },
         .stype = &[_][]const u8{ "sb", "sh", "sw" },
         .btype = &[_][]const u8{ "beq", "bne", "blt", "bge", "bltu", "bgeu" },
         .utype = &[_][]const u8{ "lui", "auipc" },
