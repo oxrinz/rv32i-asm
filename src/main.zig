@@ -398,11 +398,9 @@ fn parseInstruction(allocator: *const std.mem.Allocator, tokens: [][]const u8, l
             };
         },
         .BType => {
-            std.debug.print("lable name: {s}\n", .{tokens[3]});
             var found: ?usize = null;
 
             for (lines, 0..) |line, found_index| {
-                std.debug.print("id: {}\nline_token: {s}\n", .{ found_index, line[0 .. line.len - 1] });
                 if (std.mem.eql(u8, line[0 .. line.len - 1], tokens[3])) {
                     found = found_index;
                     break;
@@ -417,7 +415,6 @@ fn parseInstruction(allocator: *const std.mem.Allocator, tokens: [][]const u8, l
             if (found_index < index) {
                 imm = -@as(i12, @intCast(index - found_index));
             } else {
-                std.debug.print("found: {?} \nindex: {}\n", .{ found, index });
                 const byte_offset = found_index - index;
 
                 if (byte_offset > 2047)
