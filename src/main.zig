@@ -396,15 +396,16 @@ fn parseInstruction(allocator: *const std.mem.Allocator, tokens: [][]const u8, l
         },
         .BType => {
             var found: ?usize = null;
-
+            var buffer: [33]u8 = undefined;
+            const label_name = std.fmt.bufPrint(&buffer, "{s}:", .{tokens[3]}) catch unreachable;
             for (lines, 0..) |line, found_index| {
-                if (std.mem.eql(u8, line[0 .. line.len - 1], tokens[3])) {
+                if (std.mem.eql(u8, line[0..line.len], label_name)) {
                     found = found_index;
                     break;
                 }
             }
 
-            if (found == undefined) std.debug.panic("Label of name {s} not found", .{tokens[3]});
+            if (found == undefined) std.debug.panic("Label of name {s} not found", .{label_name});
 
             var imm: i12 = undefined;
             const found_index = found.?;
