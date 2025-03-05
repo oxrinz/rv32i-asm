@@ -79,6 +79,7 @@ const Instruction = union(enum) {
 
                 const rd = @as(u32, itype.rd);
                 const rs1 = @as(u32, itype.rs1);
+
                 const imm_bits: u12 = @bitCast(itype.imm);
                 const imm = switch (itype.instruction) {
                     .SLLI, .SRLI => @as(u32, imm_bits & 0x1F),
