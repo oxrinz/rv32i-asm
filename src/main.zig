@@ -300,13 +300,49 @@ fn parseRegister(reg: []const u8, reg_map: *const std.StringHashMap(u8)) !u8 {
     }
 }
 
+fn findLabelRelativeIndex(lines: [][]const u8, name: []const u8, index: usize) i32 {
+    var found: ?usize = null;
+    var buffer: [33]u8 = undefined;
+    const label_name = std.fmt.bufPrint(&buffer, "{s}:", .{name}) catch unreachable;
+
+    for (lines, 0..) |line, found_index| {
+        if (std.mem.eql(u8, line[0..line.len], label_name)) {
+            found = found_index;
+            break;
+        }
+    }
+
+    if (found == null) std.debug.panic("Label of name {s} not found", .{label_name});
+    const found_index = found.?;
+
+    var labels_encountered: usize = 0;
+
+    if (found_index < index) {
+        for (lines[found_index..index]) |line| {
+            if (line.len > 0 and line[line.len - 1] == ':') {
+                labels_encountered += 1;
+            }
+        }
+
+        return -@as(i32, @intCast(index - found_index - labels_encountered));
+    } else {
+        for (lines[index..found_index]) |line| {
+            if (line.len > 0 and line[line.len - 1] == ':') {
+                labels_encountered += 1;
+            }
+        }
+
+        return @as(i32, @intCast(found_index - index - labels_encountered));
+    }
+}
+
 fn parseInstruction(allocator: *const std.mem.Allocator, tokens: [][]const u8, lines: [][]const u8, index: usize) !Instruction {
     var reg_map = try createRegMap(allocator);
     defer reg_map.deinit();
 
     const instruction_token = tokens[0];
     const instruction_sets = .{
-        .rtype = &[_][]const u8{ "add", "sub", "mul", "div", "sll", "slt", "sltu", "xor", "srl", "sra", "or", "and" },
+        .rtype = &[_][]const u8{ "add", "sub", "mul", "div", "rem", "sll", "slt", "sltu", "xor", "srl", "sra", "or", "and" },
         .itype = &[_][]const u8{ "addi", "muli", "divi", "slti", "sltiu", "xori", "andi", "ori", "slli", "srli", "srai", "lb", "lh", "lw", "lbu", "lhu", "jalr" },
         .stype = &[_][]const u8{ "sb", "sh", "sw" },
         .btype = &[_][]const u8{ "beq", "bne", "blt", "bge", "bltu", "bgeu" },
@@ -387,26 +423,7 @@ fn parseInstruction(allocator: *const std.mem.Allocator, tokens: [][]const u8, l
             };
         },
         .BType => {
-            var found: ?usize = null;
-            var buffer: [33]u8 = undefined;
-            const label_name = std.fmt.bufPrint(&buffer, "{s}:", .{tokens[3]}) catch unreachable;
-            for (lines, 0..) |line, found_index| {
-                if (std.mem.eql(u8, line[0..line.len], label_name)) {
-                    found = found_index;
-                    break;
-                }
-            }
-
-            if (found == undefined) std.debug.panic("Label of name {s} not found", .{label_name});
-
-            var imm: i12 = undefined;
-            const found_index = found.?;
-
-            if (found_index < index) {
-                imm = -@as(i12, @intCast(index - found_index));
-            } else {
-                imm = @as(i12, @intCast(found_index - index));
-            }
+            const imm: i12 = @intCast(findLabelRelativeIndex(lines, tokens[3], index));
 
             instruction = .{
                 .BType = .{
@@ -427,26 +444,7 @@ fn parseInstruction(allocator: *const std.mem.Allocator, tokens: [][]const u8, l
             };
         },
         .JType => {
-            var found: ?usize = null;
-            var buffer: [33]u8 = undefined;
-            const label_name = std.fmt.bufPrint(&buffer, "{s}:", .{tokens[2]}) catch unreachable;
-            for (lines, 0..) |line, found_index| {
-                if (std.mem.eql(u8, line[0..line.len], label_name)) {
-                    found = found_index;
-                    break;
-                }
-            }
-
-            if (found == undefined) std.debug.panic("Label of name {s} not found", .{label_name});
-
-            var imm: i20 = undefined;
-            const found_index = found.?;
-
-            if (found_index < index) {
-                imm = -@as(i20, @intCast(index - found_index));
-            } else {
-                imm = @as(i20, @intCast(found_index - index));
-            }
+            const imm: i20 = @intCast(findLabelRelativeIndex(lines, tokens[2], index));
 
             instruction = .{
                 .JType = .{
